@@ -1,0 +1,83 @@
+.skin-stack { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #15130f; pointer-events: none; }
+.skin-layer {
+  position: absolute; inset: -2%; z-index: 0; opacity: 0; will-change: opacity, transform, filter;
+  background-repeat: no-repeat; background-size: cover;
+  background-position: calc(var(--skin-x, 50) * 1%) calc(var(--skin-y, 50) * 1%);
+  transform:
+    translate(calc(var(--skin-translate-x, 0) * 1%), calc(var(--skin-translate-y, 0) * 1%))
+    translate3d(var(--skin-motion-x, 0px), var(--skin-motion-y, 0px), 0)
+    scale(var(--skin-scale, 1.04))
+    scale(var(--skin-motion-scale, 1));
+  filter: brightness(var(--skin-brightness)) saturate(var(--skin-saturation, 0.92)) blur(var(--skin-exit-blur, 0px));
+  transition: none;
+}
+.skin-layer.is-ambient {
+  animation: ex-ambient var(--ambient-duration, 11000ms) ease-in-out infinite;
+}
+.skin-tint.is-ambient {
+  animation: ex-ambient-tint var(--ambient-duration, 11000ms) ease-in-out infinite;
+}
+body[data-ambient-paused="true"] .skin-layer.is-ambient,
+body[data-ambient-paused="true"] .skin-tint.is-ambient,
+body[data-ambient-paused="true"] .ambient-light-demo.is-active { animation-play-state: paused; }
+.skin-layer.is-visible { opacity: 1; }
+.ex-ambient-video {
+  position: absolute; inset: -2%; z-index: 1; width: 104%; height: 104%;
+  object-fit: cover; opacity: 0; pointer-events: none;
+  transition: opacity 320ms ease; will-change: opacity;
+}
+.ex-ambient-video.is-active { opacity: 1; }
+.skin-tint { position: absolute; inset: 0; z-index: 2; background: rgba(var(--tint-rgb, 18, 15, 13), var(--skin-tint)); transition: none; }
+.skin-vignette {
+  position: absolute; inset: 0; z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(8,9,9,calc(var(--skin-vignette) * .95)) 0%, rgba(8,9,9,calc(var(--skin-vignette) * .42)) 34%, transparent 64%),
+    linear-gradient(0deg, rgba(8,9,9,calc(var(--skin-vignette) * .65)) 0%, transparent 28%);
+  transition: none;
+}
+.ambient-light-demo {
+  position: absolute; inset: -12%; z-index: 3; opacity: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 38% 46%, rgba(255, 216, 158, .96) 0%, rgba(255, 230, 190, .52) 24%, rgba(255, 244, 222, 0) 61%);
+  mix-blend-mode: screen; transform: translate3d(-1.4%, -.4%, 0) scale(1.035);
+  will-change: transform; transition: opacity 500ms ease;
+}
+.ambient-light-demo.is-active {
+  opacity: var(--ambient-light-opacity, .04);
+  animation: ambient-light-drift var(--ambient-light-duration, 11000ms) ease-in-out infinite;
+}
+
+@keyframes ex-ambient {
+  0%, 100% {
+    transform: translate(calc(var(--skin-translate-x, 0) * 1%), calc(var(--skin-translate-y, 0) * 1%)) translate3d(0, 0, 0) scale(var(--skin-scale, 1.04)) scale(1);
+    filter: brightness(var(--skin-brightness)) saturate(var(--skin-saturation, .92));
+  }
+  50% {
+    transform: translate(calc(var(--skin-translate-x, 0) * 1%), calc(var(--skin-translate-y, 0) * 1%)) translate3d(var(--ambient-x-peak, 3px), var(--ambient-y-peak, -2px), 0) scale(var(--skin-scale, 1.04)) scale(var(--ambient-scale-peak, 1.003));
+    filter: brightness(calc(var(--skin-brightness) + var(--ambient-brightness-peak, .02))) saturate(var(--skin-saturation, .92));
+  }
+}
+
+@keyframes ex-ambient-tint {
+  0%, 100% { opacity: 1; }
+  50% { opacity: calc(1 - var(--ambient-tint-peak, .03)); }
+}
+
+@keyframes ambient-light-drift {
+  0%, 100% { transform: translate3d(-1.4%, -.4%, 0) scale(1.035); }
+  50% { transform: translate3d(1.4%, .5%, 0) scale(1.045); }
+}
+
+@media (max-aspect-ratio: 16 / 10) {
+  .skin-layer { background-size: auto 106%; background-position: calc((var(--skin-x, 50) + 8) * 1%) calc(var(--skin-y, 50) * 1%); }
+}
+
+@media (max-width: 700px) {
+  .skin-layer { background-position: calc((var(--skin-x, 50) + 18) * 1%) center; }
+  .skin-vignette { background: linear-gradient(90deg, rgba(8,9,9,calc(var(--skin-vignette) * .9)) 0%, rgba(8,9,9,calc(var(--skin-vignette) * .35)) 68%, transparent 100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skin-layer, .skin-tint, .ex-ambient-video, .ambient-light-demo, .boot-screen { transition-duration: 1ms !important; }
+  .skin-layer.is-ambient, .skin-tint.is-ambient { animation: none !important; }
+  .ambient-light-demo.is-active { opacity: 0 !important; animation: none !important; }
+}

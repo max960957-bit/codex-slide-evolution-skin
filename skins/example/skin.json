@@ -1,0 +1,17 @@
+{
+  "formatVersion": 1,
+  "name": "My Skin",
+  "author": "",
+  "levels": [
+    "l1.png",
+    "l2.png",
+    "l3.png",
+    "l4.png",
+    "l5.png",
+    "l6.png"
+  ],
+  "ex": {
+    "poster": "ex.png",
+    "video": "ex.mp4"
+  }
+}

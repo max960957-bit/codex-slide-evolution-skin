@@ -1,0 +1,73 @@
+{
+  "sourceCommit": "80eb01143daae693a7d6f25fe329d723a41183da",
+  "files": [
+    {
+      "path": "preview.html",
+      "sha256": "64485604b53cc3833bd56c0f7acd165ab9b46d059704610d0ddd4e2ad667d1b8"
+    },
+    {
+      "path": "src/js/skin-config.js",
+      "sha256": "c06389eba6c70c56a8ac90c418519f508281f043b380d56b6cb52f3394d46e20"
+    },
+    {
+      "path": "src/js/visual-interpolation.js",
+      "sha256": "ab11b2d6af1fe95b7349cbbaf3dc5bbe22706544fe1a876139f7ee89575dec3a"
+    },
+    {
+      "path": "src/js/skin-engine.js",
+      "sha256": "8d7f9292a3db2bdc641db83768a6e992f93667c30e5f2f10a068c5ba4f6dfb2e"
+    },
+    {
+      "path": "src/js/pelican-transition.js",
+      "sha256": "2b4430a11d985fa19119ef634e7f4efef6773bbd9025042a66e3619885f5c3a1"
+    },
+    {
+      "path": "src/js/ex-motion.js",
+      "sha256": "511108108ff5dd36011d0a800d6840abe4adba84f84abc54e68df294ca143ba0"
+    },
+    {
+      "path": "src/styles/skin.css",
+      "sha256": "8368bcf7ad9e30753aa5387b7b1af045c6e61efd8c40b54f7a82228186fd55bb"
+    },
+    {
+      "path": "src/styles/pelican-transition.css",
+      "sha256": "4199655ba96efd73bedba18ab236290a33573fd3f0a487297792f53cfd603da5"
+    },
+    {
+      "path": "assets/anchors/frame_01.png",
+      "sha256": "9849e41b833b28fe6d88eb7d1d0b38add71161016f7470188fac97b632eadd14"
+    },
+    {
+      "path": "assets/levels/frame_02.png",
+      "sha256": "e295e775ac3dd95c35575d5431f79b06dfe51dc6749668fca21af6d354bbc1ce"
+    },
+    {
+      "path": "assets/levels/level_03.png",
+      "sha256": "b3ec2f3b9b7cbe2a6bf3bd61a6eff97439e07a6e33b502253f6e69053cdc8e61"
+    },
+    {
+      "path": "assets/anchors/frame_16.png",
+      "sha256": "c89eb8014ef6249a1982b07bdd619c95cddef3f4a5baca1d52b5b4b00f909326"
+    },
+    {
+      "path": "assets/levels/level_05.png",
+      "sha256": "742c834d87d0e59218853f247bf69b60709230e228173fc5629530812421f094"
+    },
+    {
+      "path": "assets/anchors/frame_31.png",
+      "sha256": "ac9b344e1935a1c09bf7dc65abf3440ae9f102032d03df777fcf775025e651e8"
+    },
+    {
+      "path": "assets/anchors/frame_ex.png",
+      "sha256": "389081cc848929d84bcbffc86771eeae7dd5fb802e307f25cf287cff2a3ffbe2"
+    },
+    {
+      "path": "assets/ex/ex_ambient_loop.mp4",
+      "sha256": "f99d336d48ac1b9318e0ba85aac8140691712efd69b7b8eb95d2a02924c3259d"
+    },
+    {
+      "path": "assets/transitions/pelican_occlusion.png",
+      "sha256": "9e4d4688013d78ce1c6d33a2c820479dd36632f13f6ecb5a2b3690846bcf03a9"
+    }
+  ]
+}

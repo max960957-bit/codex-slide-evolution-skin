@@ -1,0 +1,8 @@
+{
+  "version": "v24.16.0",
+  "platform": "win32",
+  "architecture": "x64",
+  "signer": "OpenJS Foundation",
+  "sha256": "B3094D0B49F9AD602262A9921551737BB97637C05DD357A06AE98188D7290AA3",
+  "licenseSource": "https://raw.githubusercontent.com/nodejs/node/v24.16.0/LICENSE"
+}

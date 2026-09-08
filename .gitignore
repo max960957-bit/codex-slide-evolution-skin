@@ -1,0 +1,7 @@
+runs/
+dist/
+runtime/
+*.lnk
+*.log
+*.tmp
+

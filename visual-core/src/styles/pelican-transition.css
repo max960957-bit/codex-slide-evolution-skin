@@ -1,0 +1,50 @@
+.pelican-filter-defs {
+  position: fixed;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pelican-transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.pelican-transition-image {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: min(74vw, 1680px);
+  height: auto;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  transform-origin: 35% 55%;
+  transition: none;
+}
+
+.skin-layer.is-pelican-reveal {
+  -webkit-mask-image: radial-gradient(
+    ellipse var(--pelican-reveal-rx, 1px) var(--pelican-reveal-ry, 1px)
+    at var(--pelican-reveal-x, 50%) var(--pelican-reveal-y, 50%),
+    #000 0%,
+    #000 52%,
+    rgba(0, 0, 0, .88) 64%,
+    rgba(0, 0, 0, .42) 80%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse var(--pelican-reveal-rx, 1px) var(--pelican-reveal-ry, 1px)
+    at var(--pelican-reveal-x, 50%) var(--pelican-reveal-y, 50%),
+    #000 0%,
+    #000 52%,
+    rgba(0, 0, 0, .88) 64%,
+    rgba(0, 0, 0, .42) 80%,
+    transparent 100%
+  );
+}

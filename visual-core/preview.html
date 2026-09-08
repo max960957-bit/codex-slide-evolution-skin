@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Codex 滑动变富器 · Preview</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23171715'/%3E%3Cpath d='M16 7v18M7 16h18M9.6 9.6l12.8 12.8M22.4 9.6 9.6 22.4' stroke='%23e1cdb1' stroke-width='2'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="src/styles/base.css" />
+    <link rel="stylesheet" href="src/styles/skin.css" />
+    <link rel="stylesheet" href="src/styles/pelican-transition.css" />
+    <link rel="stylesheet" href="src/styles/codex-ui.css" />
+    <link rel="stylesheet" href="src/styles/controls.css" />
+  </head>
+  <body data-theme="borrow" data-ready="false">
+    <svg class="pelican-filter-defs" aria-hidden="true" focusable="false">
+      <defs>
+        <filter id="pelicanEdgeBlend" x="-4%" y="-4%" width="108%" height="108%" color-interpolation-filters="sRGB">
+          <feGaussianBlur id="pelicanEdgeSoftener" in="SourceAlpha" stdDeviation="0.6" result="softAlpha" />
+          <feComposite in="SourceGraphic" in2="softAlpha" operator="in" result="featheredSubject" />
+          <feMorphology id="pelicanEdgeErode" in="SourceAlpha" operator="erode" radius="0.6" result="innerAlpha" />
+          <feComposite in="SourceAlpha" in2="innerAlpha" operator="out" result="innerEdge" />
+          <feFlood id="pelicanEdgeTint" flood-color="#74819f" flood-opacity="0.035" result="edgeTint" />
+          <feComposite in="edgeTint" in2="innerEdge" operator="in" result="tintedInnerEdge" />
+          <feComposite in="tintedInnerEdge" in2="featheredSubject" operator="over" />
+        </filter>
+      </defs>
+    </svg>
+
+    <div class="skin-stack" aria-hidden="true">
+      <div class="skin-layer skin-layer-a" id="skinLayerA"></div>
+      <div class="skin-layer skin-layer-b" id="skinLayerB">
+        <video class="ex-ambient-video" id="exAmbientVideo" muted loop autoplay playsinline preload="auto" poster="assets/anchors/frame_ex.png"></video>
+      </div>
+      <div class="skin-tint"></div>
+      <div class="skin-vignette"></div>
+      <div class="ambient-light-demo" id="ambientLightDemo"></div>
+    </div>
+
+    <div class="pelican-transition-overlay" id="pelicanTransitionOverlay" aria-hidden="true" hidden>
+      <img class="pelican-transition-image" id="pelicanOcclusion" alt="" draggable="false" />
+    </div>
+
+    <div class="boot-screen" id="bootScreen" role="status">
+      <span class="boot-mark"></span>
+      <span>正在检查六档图片槽与EX…</span>
+    </div>
+
+    <main class="app-shell" id="appShell">
+      <header class="topbar surface-topbar">
+        <div class="window-controls" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="task-title">
+          <span class="codex-glyph" aria-hidden="true">✣</span>
+          <span>Codex 滑动变富器</span>
+          <span class="preview-pill">PREVIEW</span>
+        </div>
+        <button class="icon-button" type="button" aria-label="更多选项" data-toast="这是离线 Preview，不会打开账户菜单">•••</button>
+      </header>
+
+      <aside class="sidebar surface-sidebar" aria-label="任务侧栏">
+        <button class="new-task" type="button" data-action="new-task"><span>＋</span> 新任务</button>
+        <nav class="task-nav" aria-label="任务列表">
+          <p class="nav-label">今天</p>
+          <button class="task-item is-active" type="button" data-task="skin"><span class="task-dot"></span><span>调试滑动变富器</span></button>
+          <button class="task-item" type="button" data-task="layout"><span class="task-dot"></span><span>检查响应式布局</span></button>
+          <p class="nav-label">昨天</p>
+          <button class="task-item" type="button" data-task="assets"><span class="task-dot"></span><span>整理视觉素材</span></button>
+        </nav>
+        <div class="sidebar-footer">
+          <button class="profile-button" type="button" data-toast="离线演示账户">
+            <span class="avatar">E</span><span><b>EDY</b><small>本地工作区</small></span><span>⌄</span>
+          </button>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <div class="conversation-scroll" id="conversationScroll" tabindex="0">
+          <div class="conversation">
+            <div class="conversation-heading">
+              <div>
+                <p class="kicker">LOCAL TASK</p>
+                <h1>让皮肤服从界面，而不是让界面躲开皮肤。</h1>
+              </div>
+              <span class="status-chip"><i></i> 已就绪</span>
+            </div>
+
+            <article class="message user-message surface-card">
+              <p>接入六档独立主线背景，保留真实 Codex 的阅读和操作秩序。</p>
+            </article>
+
+            <article class="message assistant-message">
+              <div class="assistant-icon">✣</div>
+              <div class="message-body">
+                <p>六档主线图与EX已加载。背景层不接收鼠标事件，侧栏、滚动区、输入框和档位选择器仍然可用。</p>
+                <div class="file-card surface-card">
+                  <div class="file-card-head">
+                    <span><i class="file-icon">CSS</i> src/styles/skin.css</span>
+                    <span class="file-delta">+42</span>
+                  </div>
+                  <pre><code><span class="line-add">+ pointer-events: none;</span>
+<span class="line-add">+ background-size: cover;</span>
+<span class="line-add">+ transition: opacity var(--skin-duration);</span></code></pre>
+                </div>
+                <div class="check-row"><span>✓</span> 六档独立素材预加载完成</div>
+                <div class="check-row"><span>✓</span> 主线轻量错峰已启用</div>
+              </div>
+            </article>
+
+            <article class="message assistant-message demo-response" id="demoResponse" hidden>
+              <div class="assistant-icon">✣</div>
+              <div class="message-body"><p id="demoResponseText"></p></div>
+            </article>
+          </div>
+        </div>
+
+        <div class="composer-wrap">
+          <form class="composer surface-input" id="composerForm">
+            <textarea id="promptInput" rows="1" aria-label="任务输入" placeholder="描述你的任务…"></textarea>
+            <div class="composer-actions">
+              <div class="composer-left">
+                <button class="round-button" type="button" aria-label="添加附件" data-toast="附件按钮可点击">＋</button>
+                <button class="tool-button" type="button" data-toast="工具菜单可点击">工具 <span>⌄</span></button>
+              </div>
+              <div class="composer-right">
+                <button class="model-selector surface-model" type="button" data-model-selector>
+                  <span><b>GPT-5</b><small>标准档位</small></span><span>⌄</span>
+                </button>
+                <button class="send-button" type="submit" aria-label="发送">↑</button>
+              </div>
+            </div>
+          </form>
+          <p class="disclaimer">Preview 仅验证视觉与交互，不连接模型、账户或计费。</p>
+        </div>
+      </section>
+    </main>
+
+    <details class="motion-debug" id="motionDebug" hidden>
+      <summary>6-Level · Motion Debug</summary>
+      <div class="motion-debug-panel">
+        <div class="debug-checks">
+          <label><input id="debugTransitionEnabled" type="checkbox" checked /> EX transition</label>
+          <label><input id="debugAmbientEnabled" type="checkbox" checked /> EX ambient</label>
+          <label><input id="debugReducedMotion" type="checkbox" checked /> Respect reduced motion</label>
+          <label><input id="debugAmbientBoost" type="checkbox" /> Ambient Test ×8</label>
+          <label><input id="debugWarmLight" type="checkbox" /> Warm light layer</label>
+        </div>
+        <label class="debug-range">Transition <input id="debugTransitionDuration" type="range" min="1000" max="1400" step="50" value="1250" /><output>1250 ms</output></label>
+        <label class="debug-range">Ambient cycle <input id="debugAmbientDuration" type="range" min="8000" max="14000" step="500" value="11000" /><output>11000 ms</output></label>
+        <label class="debug-range">Ambient intensity <input id="debugAmbientIntensity" type="range" min="0" max="1.5" step="0.1" value="1" /><output>1.0×</output></label>
+        <div class="debug-actions">
+          <button type="button" data-debug-demo="mainline">Demo L1→L6</button>
+          <button type="button" data-debug-demo="ex">Demo L6→EX→L6</button>
+          <button type="button" data-debug-demo="ambient-x8">Record A · ×8</button>
+          <button type="button" data-debug-demo="warm-light">Record B · Warm light</button>
+        </div>
+        <pre id="mainlineMotionInspector" aria-live="polite">mainline motion: stable</pre>
+        <div class="pelican-debug-fields" id="pelicanDebugFields">
+          <label class="debug-range">Pelican duration <input id="debugPelicanDuration" type="range" min="850" max="1200" step="10" value="1120" /><output>1120 ms</output></label>
+          <label class="debug-range">Max scale <input id="debugPelicanMaxScale" type="range" min="1.18" max="1.30" step="0.01" value="1.21" /><output>1.21</output></label>
+          <label class="debug-range">Max blur <input id="debugPelicanMaxBlur" type="range" min="0" max="2" step="0.1" value="1.8" /><output>1.8 px</output></label>
+          <label class="debug-range">Dissolve start <input id="debugPelicanDissolveStart" type="range" min="350" max="650" step="10" value="470" /><output>470 ms</output></label>
+          <label class="debug-range">Dissolve end <input id="debugPelicanDissolveEnd" type="range" min="550" max="850" step="10" value="740" /><output>740 ms</output></label>
+          <div class="pelican-path-fields">
+            <label>P0 <input id="debugPelicanP0" type="text" value="-0.12,0.72" /></label>
+            <label>P1 <input id="debugPelicanP1" type="text" value="0.12,0.64" /></label>
+            <label>P2 <input id="debugPelicanP2" type="text" value="0.46,0.36" /></label>
+            <label>P3 <input id="debugPelicanP3" type="text" value="1.10,-0.06" /></label>
+          </div>
+        </div>
+        <pre id="pelicanTransitionInspector" aria-live="polite">pelican: loading</pre>
+        <pre id="visualTokenInspector" aria-live="polite">waiting for visual state…</pre>
+      </div>
+    </details>
+
+    <section class="dev-controls" aria-label="皮肤开发控制器">
+      <div class="stage-buttons" id="levelButtons" role="group" aria-label="推理档位切换">
+        <button type="button" class="stage-button stage-ex" id="exStageButton" data-stage="ex"><b>EX</b><span>逍遥</span></button>
+      </div>
+      <div class="slider-control">
+        <div class="slider-meta"><span id="stageNarrative">L1 · 寒微</span><output id="stageOutput" for="evolutionSlider">L1</output></div>
+        <input id="evolutionSlider" type="range" min="1" max="6" value="1" step="1" aria-label="推理档位" />
+      </div>
+      <label class="ex-toggle">
+        <input id="exToggle" type="checkbox" />
+        <span class="toggle-track"><span></span></span>
+        <span><b>1.5×</b><small>自由终态</small></span>
+      </label>
+      <div class="load-state" id="loadState"><i></i><span>载入中</span></div>
+    </section>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="src/js/skin-config.js"></script>
+    <script src="src/js/visual-interpolation.js"></script>
+    <script src="src/js/preview-host.js"></script>
+    <script src="src/js/skin-engine.js"></script>
+    <script src="src/js/pelican-transition.js"></script>
+    <script src="src/js/ex-motion.js"></script>
+    <script src="src/js/ex-video-background.js"></script>
+    <script src="src/js/preview-controls.js"></script>
+    <script src="src/js/app.js"></script>
+  </body>
+</html>
