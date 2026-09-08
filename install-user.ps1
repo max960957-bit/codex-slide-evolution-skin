@@ -1,6 +1,7 @@
 ﻿[CmdletBinding()]
-param([string]$SourceRoot = $PSScriptRoot, [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'CodexSlideEvolutionSkin'))
+param([string]$SourceRoot, [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'CodexSlideEvolutionSkin'))
 $ErrorActionPreference = 'Stop'
+$SourceRoot = if ($SourceRoot) { $SourceRoot } else { $PSScriptRoot }
 $source = [IO.Path]::GetFullPath($SourceRoot); $target = [IO.Path]::GetFullPath($InstallRoot)
 if ($target -eq $source -or $target.StartsWith($source + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'Install target must be outside source.' }
 $required = @('启动换肤.cmd','启动自定义皮肤.cmd','导入皮肤.cmd','管理皮肤.cmd','glass-lab.ps1','glass.js','sequence-host.js','ex-video-loop.js','build-sequence.js','skin-pack.js','select-skin.ps1','import-skin.ps1','manage-skins.ps1','使用说明.md','皮肤制作说明.md','visual-core','vendor\node','skins\example')
