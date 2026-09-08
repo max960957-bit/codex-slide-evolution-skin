@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param()
 $ErrorActionPreference = 'Stop'
 $packageRoot = Join-Path $PSScriptRoot ('dist\portable-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0,8))
@@ -20,4 +20,3 @@ $hashes = Get-ChildItem -LiteralPath $packageRoot -File -Recurse | ForEach-Objec
 $hashes | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $packageRoot 'package-hashes.json') -Encoding UTF8
 Compress-Archive -LiteralPath $packageRoot -DestinationPath ($packageRoot + '.zip')
 Write-Output ($packageRoot + '.zip')
-
