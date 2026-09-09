@@ -50,7 +50,7 @@ function Test-CodexUiRunning {
 function Start-Session {
  $script:session=Join-Path $InstallRoot ('runtime\panel-'+[guid]::NewGuid().ToString('N'));[void][IO.Directory]::CreateDirectory($script:session)
  $args=@('-NoLogo','-NoProfile','-STA','-ExecutionPolicy','Bypass','-File',('"'+(Join-Path $InstallRoot 'glass-lab.ps1')+'"'),'-SequenceReview','-DisableGpu','-SkinDirectory',('"'+$script:pendingSkin+'"'),'-StopRequestPath',('"'+(Join-Path $script:session 'stop')+'"'))
- $script:worker=Start-Process powershell.exe -ArgumentList $args -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $script:session 'out.txt') -RedirectStandardError (Join-Path $script:session 'error.txt')
+ $script:worker=Start-Process wscript.exe -ArgumentList @((Join-Path $InstallRoot 'run-hidden.vbs'),(Join-Path $InstallRoot 'glass-lab.ps1'),'-SequenceReview','-DisableGpu','-SkinDirectory',$script:pendingSkin,'-StopRequestPath',(Join-Path $script:session 'stop')) -WindowStyle Hidden -PassThru
  $script:waiting=$false;$status.Text='正在启动和加载素材… 面板会保持打开。'
 }
 $start.Add_Click({
