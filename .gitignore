@@ -5,3 +5,7 @@ runtime/
 *.log
 *.tmp
 
+
+panel/node_modules/
+vendor/webview2/sdk/
+vendor/webview2/sdk.zip

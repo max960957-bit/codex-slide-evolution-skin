@@ -1,0 +1,1 @@
+require('esbuild').buildSync({entryPoints:[require('path').join(__dirname,'app.jsx')],bundle:true,minify:true,outfile:require('path').join(__dirname,'app.js'),define:{'process.env.NODE_ENV':JSON.stringify('production')}});

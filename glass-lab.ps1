@@ -1,5 +1,5 @@
 ﻿[CmdletBinding()]
-param([switch]$ContentReview, [switch]$SequenceReview, [switch]$DisableGpu, [string]$SkinDirectory)
+param([switch]$ContentReview, [switch]$SequenceReview, [switch]$DisableGpu, [string]$SkinDirectory, [string]$StopRequestPath)
 
 if ($SequenceReview) { $ContentReview = $true }
 
@@ -815,7 +815,7 @@ try {
       do {
         Start-Sleep -Seconds 2
         $sequenceEvidence = Invoke-CdpValue -Socket $socket -Id 41 -Stage 'd6-sequence-evidence' -Expression 'window.__codexSequence.status()'
-      } until ($sequenceEvidence.stopRequested -and -not $sequenceEvidence.busy)
+      } until (($sequenceEvidence.stopRequested -or ($StopRequestPath -and (Test-Path -LiteralPath $StopRequestPath))) -and -not $sequenceEvidence.busy)
       [System.IO.File]::WriteAllText((Join-Path $RunRoot 'D6_STRUCTURE.json'), ($sequenceEvidence | ConvertTo-Json -Depth 15), [System.Text.UTF8Encoding]::new($false))
       $result.Sequence = if ($sequenceEvidence.ready -and @($sequenceEvidence.visited).Count -eq 6 -and $sequenceEvidence.exSeen -and $sequenceEvidence.videoPlayed -and -not $sequenceEvidence.busy -and $sequenceEvidence.phase -eq 'mainline') { 'ALL_LEVELS_VIDEO_AND_RETURN_REVIEWED' } else { 'PARTIAL' }
     } else {
