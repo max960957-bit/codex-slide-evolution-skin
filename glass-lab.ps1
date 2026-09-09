@@ -360,6 +360,62 @@ function Mount-Sequence {
   Throw-LabFailure 'D6 media loading did not finish within 60 seconds; transport polling remained responsive.'
 }
 
+function Get-SequenceRecoveryTarget {
+  # Only a replacement renderer inside our original, still-running browser is eligible.
+  $connections = @(Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction Stop)
+  $owner = Assert-LoopbackListenerOwner -Connections $connections -Install $codex
+  $process = Get-CimInstance Win32_Process -Filter "ProcessId=$owner" -ErrorAction Stop
+  if ($owner -ne $sessionIdentity.ProcessId -or $process.CreationDate -ne $sessionIdentity.CreationDate) { throw 'Recovery owner identity changed.' }
+  $version = Invoke-RestMethod -Uri "$baseUri/json/version" -TimeoutSec 3 -MaximumRedirection 0
+  if ($version.webSocketDebuggerUrl -cne $browserUri.AbsoluteUri) { throw 'Recovery browser identity changed.' }
+  $targets = @(Invoke-RestMethod -Uri "$baseUri/json/list" -TimeoutSec 3 -MaximumRedirection 0 | ForEach-Object { $_ })
+  $pages = @($targets | Where-Object { $_.type -eq 'page' -and $_.url -match '^app://' })
+  if ($pages.Count -ne 1) { throw 'Recovery requires one app renderer.' }
+  return (Assert-LocalWebSocketUrl -Url $pages[0].webSocketDebuggerUrl -Port $port -PathPrefix '/devtools/page/')
+}
+
+function Restore-SequenceVisual {
+  $state = Invoke-CdpValue -Socket $socket -Id 42 -Stage 'recovery-state' -Expression "({ shell: document.querySelectorAll('main[data-app-shell-main-surface]').length === 1 && !!document.querySelector('[data-codex-composer-root]') && !!document.querySelector('[data-app-action-sidebar-scroll]'), mounted: !!window.__codexSequence && !!window.__codexD4Glass && !!document.getElementById('codex-skin-root') })"
+  if (-not $state.shell) { throw 'Recovery shell not ready.' }
+  if ($state.mounted) { return } # Transport-only failure: preserve current media and selection.
+  [void](Invoke-CdpValue -Socket $socket -Id 42 -Stage 'recovery-reset' -Expression 'window.__codexSequence?.cleanup(); window.__codexD4Glass?.cleanup(); delete window.__codexSequenceTransfer; delete window.__codexSequence; delete window.__codexD4Glass; true')
+  [void](Invoke-CdpValue -Socket $socket -Id 42 -Stage 'recovery-glass' -Expression $glassSource)
+  [void](Invoke-CdpValue -Socket $socket -Id 42 -Stage 'recovery-background' -Expression $visualExpression)
+  [void](Invoke-CdpValue -Socket $socket -Id 42 -Stage 'recovery-material' -Expression 'window.__codexD4Glass.apply(); window.__codexD4Glass.startNativeContentTracking(); true')
+  Mount-Sequence -Socket $socket -Source ([IO.File]::ReadAllText($sequenceBundle))
+  if ($sequenceEvidence -and $sequenceEvidence.level -ge 1 -and $sequenceEvidence.level -le 6) {
+    [void](Invoke-CdpValue -Socket $socket -Id 42 -Stage 'recovery-level' -Expression "window.__codexSequence.select($([int]$sequenceEvidence.level))")
+    if ($sequenceEvidence.phase -in @('ambient','entering')) {
+      [void](Invoke-CdpValue -Socket $socket -Id 42 -Stage 'recovery-ex' -Expression "window.__codexSequence.select('ex')")
+    }
+  }
+}
+
+function Repair-SequenceConnection {
+  Write-Host 'D6: connection interrupted; waiting for the same Codex browser and restoring the skin.'
+  $recoveryDeadline = (Get-Date).AddSeconds(60)
+  do {
+    if ($StopRequestPath -and (Test-Path -LiteralPath $StopRequestPath)) { throw 'Recovery cancelled by End Skin.' }
+    try {
+      $recoveryUri = Get-SequenceRecoveryTarget
+      if ($script:socket) { $script:socket.Dispose() }
+      $script:socket = [System.Net.WebSockets.ClientWebSocket]::new()
+      $cts = [System.Threading.CancellationTokenSource]::new([TimeSpan]::FromSeconds(5))
+      try { [void]($script:socket.ConnectAsync($recoveryUri, $cts.Token).GetAwaiter().GetResult()) } finally { $cts.Dispose() }
+      $script:targetUri = $recoveryUri
+      Restore-SequenceVisual
+      $restored = Invoke-CdpValue -Socket $socket -Id 41 -Stage 'recovery-status' -Expression 'window.__codexSequence.status()'
+      if (-not $restored.ready) { throw 'Recovered media not ready.' }
+      Add-Content -LiteralPath (Join-Path $RunRoot 'recovery.log') -Value ((Get-Date).ToString('o') + ' RECOVERED')
+      return $restored
+    } catch {
+      $recoveryError = $_.Exception.Message
+      Start-Sleep -Seconds 2
+    }
+  } while ((Get-Date) -lt $recoveryDeadline)
+  throw "Skin recovery failed: $recoveryError"
+}
+
 function Save-CdpScreenshot {
   param([Parameter(Mandatory)][System.Net.WebSockets.ClientWebSocket]$Socket, [int]$Id, [string]$Path)
   $response = Invoke-CdpCommand -Socket $Socket -Id $Id -Method 'Page.captureScreenshot' -MaxBytes 16777216 -Params @{ format = 'png'; fromSurface = $true; captureBeyondViewport = $false }
@@ -489,7 +545,7 @@ try {
   if (-not [Guid]::TryParse($browserId, [ref]$parsedBrowserId)) { Throw-LabFailure 'The CDP Browser ID was invalid.' }
   $result.BrowserIdValidation = 'PASS'
 
-  $targets = @(Invoke-RestMethod -Uri "$baseUri/json/list" -TimeoutSec 3 -MaximumRedirection 0)
+  $targets = @(Invoke-RestMethod -Uri "$baseUri/json/list" -TimeoutSec 3 -MaximumRedirection 0 | ForEach-Object { $_ })
   $appTargets = @($targets | Where-Object { "$($_.type)" -eq 'page' -and "$($_.url)" -match '^app://' })
   if ($appTargets.Count -ne 1) { Throw-LabFailure 'No trustworthy app:// renderer target was found.' }
   $targetUri = Assert-LocalWebSocketUrl -Url "$($appTargets[0].webSocketDebuggerUrl)" -Port $port -PathPrefix '/devtools/page/'
@@ -812,9 +868,14 @@ try {
     if ($SequenceReview) {
       Mount-Sequence -Socket $socket -Source ([System.IO.File]::ReadAllText($sequenceBundle))
       Write-Host 'D6: session stays open. Use L1-L6, slider, EX and Return. Click the End Skin button to clean up and restore ordinary Codex. Screenshots remain disabled.'
+      $sequenceEvidence = $null
       do {
         Start-Sleep -Seconds 2
-        $sequenceEvidence = Invoke-CdpValue -Socket $socket -Id 41 -Stage 'd6-sequence-evidence' -Expression 'window.__codexSequence.status()'
+        try {
+          $sequenceEvidence = Invoke-CdpValue -Socket $socket -Id 41 -Stage 'd6-sequence-evidence' -Expression 'window.__codexSequence.status()'
+        } catch {
+          $sequenceEvidence = Repair-SequenceConnection
+        }
       } until (($sequenceEvidence.stopRequested -or ($StopRequestPath -and (Test-Path -LiteralPath $StopRequestPath))) -and -not $sequenceEvidence.busy)
       [System.IO.File]::WriteAllText((Join-Path $RunRoot 'D6_STRUCTURE.json'), ($sequenceEvidence | ConvertTo-Json -Depth 15), [System.Text.UTF8Encoding]::new($false))
       $result.Sequence = if ($sequenceEvidence.ready -and @($sequenceEvidence.visited).Count -eq 6 -and $sequenceEvidence.exSeen -and $sequenceEvidence.videoPlayed -and -not $sequenceEvidence.busy -and $sequenceEvidence.phase -eq 'mainline') { 'ALL_LEVELS_VIDEO_AND_RETURN_REVIEWED' } else { 'PARTIAL' }
@@ -843,7 +904,7 @@ try {
         $cleanupOwner = Assert-LoopbackListenerOwner -Connections $connections -Install $codex
         $cleanupProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$cleanupOwner" -ErrorAction Stop
         if ($cleanupOwner -ne $sessionIdentity.ProcessId -or $cleanupProcess.CreationDate -ne $sessionIdentity.CreationDate) { Throw-LabFailure 'Cleanup reconnect owner identity changed.' }
-        $cleanupTargets = @(Invoke-RestMethod -Uri "$baseUri/json/list" -TimeoutSec 3 -MaximumRedirection 0)
+        $cleanupTargets = @(Invoke-RestMethod -Uri "$baseUri/json/list" -TimeoutSec 3 -MaximumRedirection 0 | ForEach-Object { $_ })
         # Debug endpoint identities only; never persist page titles or application URL paths.
         $targetEvidence = @($cleanupTargets | ForEach-Object {
           [pscustomobject]@{ type = "$($_.type)"; appPage = "$($_.url)" -match '^app://';
