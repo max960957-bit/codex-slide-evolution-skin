@@ -26,7 +26,7 @@ $targetLiteral = $target.Replace("'", "''")
 Set-Content -LiteralPath (Join-Path $target 'uninstall.ps1') -Encoding UTF8 -Value "`$ErrorActionPreference='Stop'; `$root='$targetLiteral'; if(Test-Path -LiteralPath `$root){Remove-Item -LiteralPath `$root -Recurse -Force}"
 $start = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'; New-Item -ItemType Directory -Path $start -Force | Out-Null
 $shell = New-Object -ComObject WScript.Shell; $shortcut = $shell.CreateShortcut((Join-Path $start 'Codex 滑动变富器.lnk'))
-$powershell = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
-$shortcut.TargetPath = $powershell; $shortcut.Arguments = '-NoLogo -NoProfile -STA -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + (Join-Path $target 'start-skin.ps1') + '"'; $shortcut.WorkingDirectory = $target; $shortcut.Description = '启动 Codex 滑动变富器'; $shortcut.Save()
+$wscript = Join-Path $env:SystemRoot 'System32\wscript.exe'
+$shortcut.TargetPath = $wscript; $shortcut.Arguments = '"' + (Join-Path $target 'run-hidden.vbs') + '" "' + (Join-Path $target 'start-skin.ps1') + '"'; $shortcut.WorkingDirectory = $target; $shortcut.Description = '启动 Codex 滑动变富器'; $shortcut.Save()
 $desktopShortcut = $shell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Desktop')) 'Codex 换肤.lnk')); $desktopShortcut.TargetPath = $shortcut.TargetPath; $desktopShortcut.Arguments = $shortcut.Arguments; $desktopShortcut.WorkingDirectory = $target; $desktopShortcut.Save()
 Write-Output "Installed to $target"

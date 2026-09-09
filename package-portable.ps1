@@ -21,5 +21,7 @@ $hashes = Get-ChildItem -LiteralPath $packageRoot -File -Recurse | ForEach-Objec
   [pscustomobject]@{path=$_.FullName.Substring($packageRoot.Length+1);sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash}
 }
 $hashes | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $packageRoot 'package-hashes.json') -Encoding UTF8
-Compress-Archive -LiteralPath $packageRoot -DestinationPath ($packageRoot + '.zip')
+$zipPath = $packageRoot + '.zip'
+& tar.exe -a -c -f $zipPath -C (Split-Path -Parent $packageRoot) (Split-Path -Leaf $packageRoot)
+if ($LASTEXITCODE) { throw "Could not create package archive: $LASTEXITCODE" }
 Write-Output ($packageRoot + '.zip')
