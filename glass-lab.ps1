@@ -331,8 +331,9 @@ function Invoke-CdpValue {
 
 function Mount-Sequence {
   param($Socket, [string]$Source)
+  $externalStop = if ($StopRequestPath) { 'true' } else { 'false' }
   Write-Host 'D6: transferring original media. Keep the lab Codex window open; controls appear after loading.'
-  [void](Invoke-CdpValue -Socket $Socket -Id 40 -Stage 'd6-transfer-start' -Expression "(() => { if (window.__codexSequenceTransfer || window.__codexSequence) throw Error('Already mounted'); window.__codexSequenceTransfer = { parts: [], state: 'UPLOADING' }; return true; })()")
+  [void](Invoke-CdpValue -Socket $Socket -Id 40 -Stage 'd6-transfer-start' -Expression "(() => { if (window.__codexSequenceTransfer || window.__codexSequence) throw Error('Already mounted'); window.__codexSequenceTransfer = { parts: [], state: 'UPLOADING', externalStop: $externalStop }; return true; })()")
   for ($offset = 0; $offset -lt $Source.Length; $offset += 262144) {
     $part = $Source.Substring($offset, [Math]::Min(262144, $Source.Length - $offset)) | ConvertTo-Json -Compress
     [void](Invoke-CdpValue -Socket $Socket -Id 40 -Stage "d6-transfer-offset-$offset" -Expression "window.__codexSequenceTransfer.parts.push($part)")

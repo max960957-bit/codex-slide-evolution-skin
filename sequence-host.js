@@ -56,7 +56,8 @@
   panel.innerHTML = '<style>:host{font:13px system-ui;color:#f4f1ec}nav{background:#26221fec;padding:10px;border-radius:12px;display:flex;gap:6px;align-items:center}button{font:inherit;background:#494139;color:inherit;border:1px solid #938475;border-radius:6px;padding:7px;cursor:pointer}button:disabled{opacity:.5}button[aria-pressed=true]{background:#866746}output{min-width:70px}</style><nav aria-label="换肤档位"><output aria-live="polite">载入中</output></nav>';
   const nav = panel.querySelector('nav'), output = panel.querySelector('output');
   nav.style.flexWrap = 'wrap';
-  document.body.appendChild(controls);
+  // The desktop panel owns Stop; direct legacy launches retain their controls.
+  if (!realWindow.__codexSequenceTransfer?.externalStop) document.body.appendChild(controls);
   let nativeObserver = null, nativeFrame = 0, nativeKey = null, nativePending = null;
   let nativePower = { state: 'WAITING_FOR_MENU' };
   function flushNativePower() {

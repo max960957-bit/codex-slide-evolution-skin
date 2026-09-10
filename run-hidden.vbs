@@ -7,7 +7,7 @@ command = "powershell.exe -NoLogo -NoProfile -STA -WindowStyle Hidden -Execution
 For i = 1 To WScript.Arguments.Count - 1
   command = command & " " & Quote(WScript.Arguments(i))
 Next
-shell.Run command, 0, False
+WScript.Quit shell.Run(command, 0, True)
 Function Quote(value)
   Quote = Chr(34) & Replace(value, Chr(34), Chr(34) & Chr(34)) & Chr(34)
 End Function
