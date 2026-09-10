@@ -1,6 +1,6 @@
 {
   "product": "Codex Slide Evolution Skin",
-  "version": "0.1.0-preview",
+  "version": "0.1.4",
   "platform": "Windows 11 x64",
   "codexVersion": "26.901.6511.0",
   "runtime": "Node.js v24.16.0 bundled",

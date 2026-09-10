@@ -14,6 +14,7 @@ foreach ($name in @('node.exe','LICENSE','runtime.json')) {
 }
 [void][System.IO.Directory]::CreateDirectory((Join-Path $packageRoot 'skins'))
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'skins\example') -Destination (Join-Path $packageRoot 'skins') -Recurse
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'skins\机甲') -Destination (Join-Path $packageRoot 'skins') -Recurse
 foreach($folder in @('panel','vendor\webview2')){[void][IO.Directory]::CreateDirectory((Join-Path $packageRoot $folder))}
 foreach($file in @('index.html','app.js','panel.css','LIQUID-LICENSE.txt','REACT-LICENSE.txt','REACT-DOM-LICENSE.txt')){Copy-Item -LiteralPath (Join-Path $PSScriptRoot ('panel\'+$file)) -Destination (Join-Path $packageRoot 'panel')}
 foreach($file in @('Microsoft.Web.WebView2.Core.dll','Microsoft.Web.WebView2.WinForms.dll','WebView2Loader.dll','LICENSE.txt','NOTICE.txt')){Copy-Item -LiteralPath (Join-Path $PSScriptRoot ('vendor\webview2\'+$file)) -Destination (Join-Path $packageRoot 'vendor\webview2')}

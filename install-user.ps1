@@ -4,7 +4,7 @@ $ErrorActionPreference = 'Stop'
 $SourceRoot = if ($SourceRoot) { $SourceRoot } else { $PSScriptRoot }
 $source = [IO.Path]::GetFullPath($SourceRoot); $target = [IO.Path]::GetFullPath($InstallRoot)
 if ($target -eq $source -or $target.StartsWith($source + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'Install target must be outside source.' }
-$required = @('run-hidden.vbs','web-panel.ps1','panel\index.html','panel\app.js','panel\panel.css','panel\LIQUID-LICENSE.txt','panel\REACT-LICENSE.txt','panel\REACT-DOM-LICENSE.txt','vendor\webview2\Microsoft.Web.WebView2.Core.dll','vendor\webview2\Microsoft.Web.WebView2.WinForms.dll','vendor\webview2\WebView2Loader.dll','vendor\webview2\LICENSE.txt','vendor\webview2\NOTICE.txt','start-skin.ps1','启动换肤.cmd','启动自定义皮肤.cmd','导入皮肤.cmd','管理皮肤.cmd','glass-lab.ps1','glass.js','sequence-host.js','ex-video-loop.js','build-sequence.js','skin-pack.js','select-skin.ps1','import-skin.ps1','manage-skins.ps1','使用说明.md','产品说明.md','皮肤制作说明.md','visual-core','vendor\node','skins\example')
+$required = @('run-hidden.vbs','web-panel.ps1','panel\index.html','panel\app.js','panel\panel.css','panel\LIQUID-LICENSE.txt','panel\REACT-LICENSE.txt','panel\REACT-DOM-LICENSE.txt','vendor\webview2\Microsoft.Web.WebView2.Core.dll','vendor\webview2\Microsoft.Web.WebView2.WinForms.dll','vendor\webview2\WebView2Loader.dll','vendor\webview2\LICENSE.txt','vendor\webview2\NOTICE.txt','product.json','傻瓜式教程.md','发布说明.md','start-skin.ps1','启动换肤.cmd','启动自定义皮肤.cmd','导入皮肤.cmd','管理皮肤.cmd','glass-lab.ps1','glass.js','sequence-host.js','ex-video-loop.js','build-sequence.js','skin-pack.js','select-skin.ps1','import-skin.ps1','manage-skins.ps1','使用说明.md','产品说明.md','皮肤制作说明.md','visual-core','vendor\node','skins\example')
 foreach ($item in $required) { if (-not (Test-Path -LiteralPath (Join-Path $source $item))) { throw "Missing package item: $item" } }
 New-Item -ItemType Directory -Path $target -Force | Out-Null
 foreach ($item in $required) {
@@ -21,6 +21,12 @@ if (Test-Path -LiteralPath $userSkins) {
   Copy-Item -LiteralPath $sourceExample -Destination $userSkins -Recurse -Force
   Get-ChildItem -LiteralPath $backup -Directory | Where-Object Name -ne 'example' | ForEach-Object { Move-Item -LiteralPath $_.FullName -Destination $userSkins -Force }
   Remove-Item -LiteralPath $backup -Recurse -Force
+}
+# Preserve an existing imported/customized skin with the same folder name.
+$mechaSource = Join-Path $source 'skins\机甲'
+$mechaTarget = Join-Path $target 'skins\机甲'
+if ((Test-Path -LiteralPath $mechaSource) -and -not (Test-Path -LiteralPath $mechaTarget)) {
+  Copy-Item -LiteralPath $mechaSource -Destination $mechaTarget -Recurse
 }
 $targetLiteral = $target.Replace("'", "''")
 Set-Content -LiteralPath (Join-Path $target 'uninstall.ps1') -Encoding UTF8 -Value "`$ErrorActionPreference='Stop'; `$root='$targetLiteral'; if(Test-Path -LiteralPath `$root){Remove-Item -LiteralPath `$root -Recurse -Force}"
