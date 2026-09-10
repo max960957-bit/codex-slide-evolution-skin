@@ -1,6 +1,22 @@
-# D4 L1 Glass Content Island Lab
+# Codex Slide Evolution Skin
 
-日常查看请先读 [使用说明](使用说明.md)，启动入口为本目录的 **启动换肤.lnk**（直接调用既有 run-d6-sequence.cmd，无重复启动逻辑）。下文保留历次实验记录，旧布局方案以最新修正为准。
+Windows Codex Desktop 社区换肤工具：六档系列背景、EX 视频、Liquid Studio 控制面板和自定义皮肤 ZIP 导入。
+
+## 使用入口
+
+- [产品说明](产品说明.md)：功能、兼容范围和已知限制。
+- [五分钟入门](傻瓜式教程.md)：下载、安装、启动和结束。
+- [详细使用手册](使用说明.md)：面板操作、导入机甲皮肤、升级、备份、卸载和排错。
+- [制作自己的皮肤](皮肤制作说明.md)：素材准备、配置格式和 ZIP 分享。
+- [下载完整工具包](https://github.com/max960957-bit/codex-slide-evolution-skin/releases)。
+
+当前代码限定 Windows 11 x64、官方 Store Codex `26.901.6511.0`。这是社区预览工具，不是 OpenAI 官方插件。
+
+**源码更新不等于下载包更新。** 断线恢复修复已进入 main，旧 v0.1.3 ZIP 不包含该修复；独立“机甲”皮肤包也不等于旧工具包已内置机甲。请以具体 Release 附件和说明为准。
+
+## 历史实验记录
+
+以下保留开发过程的历史记录；其中旧入口、待办和阶段性结论不代表当前用户操作。日常使用以上面的手册为准。
 
 2026-09-08 实机补充：095519-d125b34b 和 100459-e9d7ed29 两轮均 NativeContent=APPLIED，Sequence=PARTIAL，PendingMaterialChecks=NONE，全部清理及 OrdinaryCodexRestored=PASS，FailureReason=NONE。100459 的 GlassSHA256 与当前无气泡 glass.js 一致；用户已认可当前视觉方向。两轮并未完整覆盖六档/EX，也不能代替长期运行及生成中消息验证。
 
