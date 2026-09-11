@@ -11,13 +11,13 @@ function build(skinDirectory) {
     if (crypto.createHash('sha256').update(bytes).digest('hex') !== file.sha256) throw Error('Bundled core hash mismatch: ' + file.path);
   }
   const read = name => fs.readFileSync(path.join(project, name), 'utf8');
-  const files = ['skin-config', 'visual-interpolation', 'skin-engine', 'pelican-transition', 'ex-motion', 'ex-video-background'];
+  const files = ['skin-config', 'visual-interpolation', 'skin-engine', 'ex-motion', 'ex-video-background'];
   const context = { window: {} };
   vm.runInNewContext(read('src/js/skin-config.js'), context);
   const config = context.window.SKIN_CONFIG;
   const skin = skinDirectory ? require('./skin-pack').loadSkin(skinDirectory) : null;
   const paths = [...new Set([...config.levels.map(l => l.imageSlot.path), config.ex.videoBackground.poster,
-    config.ex.videoBackground.sources.mp4, 'assets/transitions/pelican_occlusion.png'])];
+    config.ex.videoBackground.sources.mp4])];
   if (config.levels.length !== 6 || !config.ex.videoBackground.sources.mp4) throw Error('Expected six levels and EX video');
   const assets = {}, manifest = [];
   let bootstrap;
@@ -32,8 +32,8 @@ function build(skinDirectory) {
     manifest.push({ path: name, bytes: bytes.length, sha256, ...(custom ? { skinFile: custom.name } : {}) });
   }
   const preview = read('preview.html');
-  const markup = preview.slice(preview.indexOf('<svg class="pelican-filter-defs"'), preview.indexOf('<div class="boot-screen"')).replace(/ poster="[^"]*"/g, '');
-  const css = ['skin', 'pelican-transition'].map(n => read(`src/styles/${n}.css`)).join('\n').replaceAll('body[', ':host([').replace(/:host\(\[([^\]]+)\]/g, ':host([$1])');
+  const markup = preview.slice(preview.indexOf('<div class="skin-stack"'), preview.indexOf('<div class="pelican-transition-overlay"')).replace(/ poster="[^"]*"/g, '');
+  const css = ['skin'].map(n => read(`src/styles/${n}.css`)).join('\n').replaceAll('body[', ':host([').replace(/:host\(\[([^\]]+)\]/g, ':host([$1])');
   const core = files.map(n => (n === 'ex-video-background' ? fs.readFileSync(path.join(__dirname, 'ex-video-loop.js'), 'utf8') : read(`src/js/${n}.js`)).replace(/(["'])(assets\/[^"']+)\1/g,
     (match, quote, name) => paths.includes(name) ? `asset(${JSON.stringify(name)})` : match)).join('\n');
   const template = fs.readFileSync(path.join(__dirname, 'sequence-host.js'), 'utf8');
@@ -51,6 +51,6 @@ if (require.main === module) {
   fs.writeFileSync(output + '.manifest.json', JSON.stringify(manifest, null, 2));
   fs.writeFileSync(output + '.bootstrap.png', bootstrap);
   fs.writeFileSync(output + '.skin.json', JSON.stringify(skin));
-  console.log('Sequence bundle ready: six images, EX poster/video, original pelican; ' + output);
+  console.log('Sequence bundle ready: six images, EX poster/video; ' + output);
 }
 module.exports = { build };

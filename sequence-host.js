@@ -152,7 +152,7 @@
     window.exMotion.configure({ ambientEnabled: false, warmLightDemoEnabled: false });
     realWindow.__codexD4Glass?.removeDiagnosticSample();
     events.addEventListener('visualstatechange', event => realWindow.__codexD4Glass?.setTheme(event.detail.tokens), { signal: abort.signal });
-    await Promise.all([window.skinEngine.init(), window.pelicanTransition.init()]);
+    await window.skinEngine.init();
     if (disposed) return false;
     for (const [value, label] of [...window.SKIN_CONFIG.levels.map(l => [l.index, `${l.displayLabel} ${l.narrativeLabel}`]), ['ex', 'EX 逍遥'], ['return', '返回']]) {
       const button = document.createElement('button'); button.type = 'button'; button.textContent = label; button.dataset.value = String(value);
